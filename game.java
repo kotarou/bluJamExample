@@ -11,12 +11,22 @@ import javax.swing.*;
  */
 public class game{
     // Game variables
-    int windowWidth    = 800;
-    int windowHeight   = 600;
+    final int TARGET_FPS = 60;
+    final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;   
+    final int WINDOW_WIDTH    = 800;
+    final int WINDOW_HEIGHT   = 600;
+        
     int textWidth      = 0;
     int graphicsWidth;
     int graphicsHeight;
     double textRatio;
+    
+    int sleepTme = 0;
+    Boolean gameRunning = true;
+    double fps = 0;
+    int lastLoopTime = 0;;
+    
+    double x = 0;
     
     JFrame windowFrame;
     JRootPane windowRoot;
@@ -24,7 +34,12 @@ public class game{
     Graphics2D graphicsPane;
     JPanel inputPanel;
     /**      */
-    public void game(){
+    public void run(){
+        // Game timing
+        long lastLoopTime = System.nanoTime();
+
+        
+        
         UI.initialise();
         
         // Get the more complicated objects for complex graphics (if needed)
@@ -35,8 +50,9 @@ public class game{
         inputPanel = (JPanel)windowRoot.getComponent(0);
         
 
-        
-        UI.setWindowSize(windowWidth,windowHeight);
+        // Should make the window non-resizable, but currently fails to do so.
+        // TODO: Make this actually work.
+        UI.setWindowSize(WINDOW_WIDTH,WINDOW_HEIGHT);
         windowFrame.setResizable(false);
         
         // Disable the menubar at the top
@@ -44,20 +60,19 @@ public class game{
         menu.setVisible(false);
         
         // Control the input panel on the left
+        // TODO: Make this actually work.
         //inputPanel.setSize(new Dimension(100,500));
         
         UI.addButton("Spawn Next Level", UI::quit);
         UI.addButton("Quit", UI::quit);
         
-        
 
-        
         // Call after all the buttons / etc are added.
         // Ratio where 0.0 = no text panel and 1.0 = no graphics panel
         if(textWidth == 0)
             textRatio = 0.0;
         else
-            textRatio = (double)textWidth / (double)(windowWidth);
+            textRatio = (double)textWidth / (double)(WINDOW_WIDTH);
         UI.setDivider(textRatio);
         
         
@@ -69,14 +84,63 @@ public class game{
         // Don't draw grpahics immediately. 
         UI.setImmediateRepaint(false);
         
-        
         windowFrame.pack();
+        
+        while(gameRunning){
+            int logicError=0, renderError=0;
+            
+            // Time since last update
+            long now = System.nanoTime();
+            long updateLength = now - lastLoopTime;
+            lastLoopTime = now;
+            double dt = updateLength / ((double)OPTIMAL_TIME);
+            
+            // frame counter
+            lastLoopTime += updateLength;
+            //fps++
+            fps = (double)1.0e9 / updateLength;
+            
+            // Update game logic
+            logicError = gameLogic(dt);
+            
+            // Render
+            if(logicError == 0)
+                renderError = gameRender();
+            
+            // Post logic here
+            if(renderError != 0)
+                gameRunning = false;
+
+            
+            try{
+                Thread.sleep( (lastLoopTime-System.nanoTime() + OPTIMAL_TIME)/1000000 );
+            }
+            catch(Exception e){
+                // Smething went wrong!
+                gameRunning = false;
+            }
+            
+        }
     }
 
+    public int gameLogic(double dt){
+        x += 1;
+        return 0;
+    }
 
+    public int gameRender(){
+        UI.clearGraphics();
+        UI.drawRect(100+x,100,50,50);
+        
+        UI.repaintGraphics();
 
+        UI.drawString(String.format("FPS: %4.2f", fps), 20, 30);
+        return 0;
+    }
+    
     public static void main(String[] args){
         game obj = new game();
+        obj.run();
     }    
 
 }
