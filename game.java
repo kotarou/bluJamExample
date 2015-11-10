@@ -25,7 +25,7 @@ public class game{
     double textRatio;
     
     int sleepTme = 0;
-    Boolean gameRunning = true;
+    boolean gameRunning = true;
     double fps = 0;
     int lastLoopTime = 0;;
     
