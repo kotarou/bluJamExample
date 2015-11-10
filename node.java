@@ -84,7 +84,6 @@ public class node implements renderable
     
     
     public void render(Graphics2D panel){
-        System.out.println("asdf");
         panel.setColor(nodeColor);
         panel.fillRect(left, top, width, height);
         panel.setColor(wallColor);

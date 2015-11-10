@@ -94,6 +94,10 @@ public class game{
         
         // Set up the in-game elements
         renderComponents.add(new gameBoard());
+        renderComponents.add(new grad(0, 8, (gameBoard)renderComponents.get(0)));
+        
+        UI.setKeyListener(this::keyResponder);
+        UI.setMouseListener(this::mouseResponder);
         
         while(gameRunning){
             int logicError=0, renderError=0;
@@ -132,6 +136,31 @@ public class game{
         }
     }
 
+    public void keyResponder(String input){
+        input = formatKey(input);
+        
+        if(input.equals("w"))
+            ((grad)this.renderComponents.get(1)).attemptMove(0);
+        if(input.equals("d"))
+            ((grad)this.renderComponents.get(1)).attemptMove(1);
+        if(input.equals("s"))
+            ((grad)this.renderComponents.get(1)).attemptMove(2);
+        if(input.equals("a"))
+            ((grad)this.renderComponents.get(1)).attemptMove(3); 
+        
+        System.out.println(input);
+    }
+    
+    public void mouseResponder(String action, double x, double y){
+        System.out.println("Mouse x: " + x + " y: " + y);
+    }
+    
+    public String formatKey(String input){
+        if(input.length() == 0)
+            return "";
+        return input.toLowerCase();
+    }
+    
     public int gameLogic(double dt){
         x += 1;
         return 0;
