@@ -1,8 +1,8 @@
 import java.awt.Graphics2D;
 
 /**
- * Abstract class renderable
- * All objects that can be rendered on the grpahics panel should inherit this.
+ * Interface renderable
+ * All objects that can be rendered on the graphics panel should implement this.
  * 
  * @author kotarou
  */

@@ -142,6 +142,7 @@ public class game{
         // This does mean we will need to redraw every object (every frame)!
         UI.clearGraphics();
         graphicsPanel = UI.getGraphics();
+        graphicsPanel.setColor(Color.BLACK);
         UI.drawRect(100+x,100,50,50);
         // FPS counter
         UI.drawString(String.format("FPS: %4.2f", fps), 20, 30);
