@@ -1,3 +1,10 @@
+/**
+ * Main class game
+ * This is the main game class, where we set up the game state
+ * 
+ * @author kotarou
+ */
+
 import ecs100.*;
 import java.util.*;
 import java.io.*;
@@ -5,10 +12,6 @@ import java.io.*;
 import java.awt.*;
 import javax.swing.*;
 
-/** 
- *  This is the main game class, where we set up the game state
- * 
- */
 public class game{
     // Game variables
     final int TARGET_FPS = 60;
@@ -27,24 +30,26 @@ public class game{
     int lastLoopTime = 0;;
     
     double x = 0;
+    ArrayList<renderable> renderComponents;
     
     JFrame windowFrame;
     JRootPane windowRoot;
     JMenuBar menu;
-    Graphics2D graphicsPane;
+    // The graphics panel needs to be grabbed every frame. 
+    Graphics2D graphicsPanel;
     JPanel inputPanel;
+    
     /**      */
     public void run(){
         // Game timing
         long lastLoopTime = System.nanoTime();
 
-        
+        renderComponents = new ArrayList<>();
         
         UI.initialise();
         
         // Get the more complicated objects for complex graphics (if needed)
         windowFrame = UI.getFrame();
-        graphicsPane = UI.getGraphics();
         windowRoot = windowFrame.getRootPane();
         menu = windowRoot.getJMenuBar();
         inputPanel = (JPanel)windowRoot.getComponent(0);
@@ -81,10 +86,14 @@ public class game{
         graphicsWidth = UI.getCanvasHeight();
         graphicsHeight = UI.getCanvasWidth();
         
+        
         // Don't draw grpahics immediately. 
         UI.setImmediateRepaint(false);
         
         windowFrame.pack();
+        
+        // Set up the in-game elements
+        renderComponents.add(new gameBoard());
         
         while(gameRunning){
             int logicError=0, renderError=0;
@@ -129,12 +138,23 @@ public class game{
     }
 
     public int gameRender(){
+        // Clear whatever was previously rendered. 
+        // This does mean we will need to redraw every object (every frame)!
         UI.clearGraphics();
+        graphicsPanel = UI.getGraphics();
         UI.drawRect(100+x,100,50,50);
+        // FPS counter
+        UI.drawString(String.format("FPS: %4.2f", fps), 20, 30);
         
+        
+        
+        for(renderable r : renderComponents){
+            r.render(graphicsPanel);
+        }
+        
+        // As immediate mode is set to false, we will need to explicitly call repaint
         UI.repaintGraphics();
 
-        UI.drawString(String.format("FPS: %4.2f", fps), 20, 30);
         return 0;
     }
     
