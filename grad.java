@@ -28,8 +28,8 @@ public class grad implements renderable
     public grad(int posX, int posY, gameBoard board)
     {      
         // The starting position, as an offset from the top left of the game board        
-        this.posX = board.nodes[posX][posY].left+4;
-        this.posY = board.nodes[posX][posY].top+3;
+        this.posX = board.nodes[posX][posY].posX+4;
+        this.posY = board.nodes[posX][posY].posY+3;
 
         this.board = board;
 
@@ -100,13 +100,13 @@ public class grad implements renderable
         // A node is bounded by node.top, node.left, node.top+height, node.left+width
         // dist to edge is positive if you are within the node, negative otherwise
         if(edge == 0)
-            return (this.posY-(this.radius+currentNode.top));
+            return (this.posY-(this.radius+currentNode.posY));
         if(edge == 1)
-            return ((currentNode.left+currentNode.width)-(this.posX+this.radius));
+            return ((currentNode.posX+currentNode.NODE_SIZE)-(this.posX+this.radius));
         if(edge == 2)
-            return ((currentNode.top+currentNode.height)-(this.posY+this.radius));
+            return ((currentNode.posY+currentNode.NODE_SIZE)-(this.posY+this.radius));
         if(edge == 3)
-            return ((this.posX-this.radius)-currentNode.left);
+            return ((this.posX-this.radius)-currentNode.posX);
 
         return -10;
     }

@@ -96,6 +96,12 @@ public class game{
         renderComponents.add(new gameBoard());
         renderComponents.add(new grad(0, 8, (gameBoard)renderComponents.get(0)));
         
+        renderComponents.add(new wall(1, 7, (gameBoard)renderComponents.get(0)));
+        renderComponents.add(new wall(2, 6, (gameBoard)renderComponents.get(0)));
+        renderComponents.add(new wall(2, 5, (gameBoard)renderComponents.get(0)));
+        renderComponents.add(new wall(3, 3, (gameBoard)renderComponents.get(0)));
+        
+        
         UI.setKeyListener(this::keyResponder);
         UI.setMouseListener(this::mouseResponder);
         
@@ -194,3 +200,8 @@ public class game{
     }    
 
 }
+
+
+
+
+

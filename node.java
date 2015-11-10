@@ -7,15 +7,13 @@
 
 import java.awt.*;
 
-public class node implements renderable
+public class node extends gameObject implements renderable
 {
-    int left, top;
-    int width = 20;
-    int height = 20;
+
+    public final int NODE_SIZE;
+    
     int hOffset = 1;
     int wOffset = 1;
-    int posX = 0;
-    int posY = 0;
     
     int wallThickness = 2;
     //int borderWidth = 1;
@@ -23,8 +21,6 @@ public class node implements renderable
     Color wallColor = Color.WHITE;
     Color nodeColor = Color.RED;
         
-    gameBoard parent;
-    
     // Top, right, bottom, left borders.
     // 1 = impassable, 0 = passable.
     public node north, east, south, west;
@@ -34,15 +30,24 @@ public class node implements renderable
     /**
      * Constructor
      */
-    public node(gameBoard parent, int posX, int posY)
+    public node(gameBoard parent, int locX, int locY)
     {
-        this.parent = parent;
-      
-        this.posX = posX;
-        this.posY = posY;
+        // The anchor of a node is the default, top left
+        // A node covers no other nodes, and it seems meaningless for a node to cover itself.
+        // A node needs no mask or shape.
         
-        this.left = parent.left + (posX*width) + ((posX+1)*wOffset);
-        this.top = parent.top + (posY*height) + ((posY+1)*hOffset);
+        this.parent = parent;
+        
+        NODE_SIZE = parent.NODE_SIZE;
+        
+        this.locX = locX;
+        this.locY = locY;
+        
+        this.posX = parent.left + (this.locX*NODE_SIZE) + ((this.locX+1)*wOffset);
+        this.posY = parent.top + (this.locY*NODE_SIZE) + ((this.locY+1)*hOffset);
+        
+        
+
         
 
             
@@ -56,26 +61,26 @@ public class node implements renderable
     */
    public void createLinks(){
         // north relation
-        if(this.posY > 0)
-            this.north = this.parent.nodes[this.posX][this.posY-1];
+        if(this.locY > 0)
+            this.north = this.parent.nodes[this.locX][this.locY-1];
         else
             this.north = null;
         
         // east relation
-        if(this.posX < this.parent.NODES_PER_SIDE - 1)
-            this.east = this.parent.nodes[this.posX+1][this.posY];
+        if(this.locX < this.parent.NODES_PER_SIDE - 1)
+            this.east = this.parent.nodes[this.locX+1][this.locY];
         else
             this.east = null;
          
         // south relation
-        if(this.posY < this.parent.NODES_PER_SIDE - 1)
-            this.south = this.parent.nodes[this.posX][this.posY+1];
+        if(this.locY < this.parent.NODES_PER_SIDE - 1)
+            this.south = this.parent.nodes[this.locX][this.locY+1];
         else
             this.south = null; 
             
         // west relation
-        if(this.posX > 0)
-            this.west = this.parent.nodes[this.posX-1][this.posY];
+        if(this.locX > 0)
+            this.west = this.parent.nodes[this.locX-1][this.locY];
         else
             this.west = null;    
 
@@ -85,16 +90,18 @@ public class node implements renderable
     
     public void render(Graphics2D panel){
         panel.setColor(nodeColor);
-        panel.fillRect(left, top, width, height);
+        int px = (int)this.posX;
+        int py = (int)this.posY;
+        panel.fillRect(px, py, NODE_SIZE, NODE_SIZE);
         panel.setColor(wallColor);
         if(this.wallNorth())
-            panel.fillRect(left,top,width,wallThickness);
+            panel.fillRect(px,py,NODE_SIZE,wallThickness);
         if(this.wallEast())
-            panel.fillRect(left+width-wallThickness,top,wallThickness,height);
+            panel.fillRect(px+NODE_SIZE-wallThickness,py,wallThickness,NODE_SIZE);
         if(this.wallSouth())
-            panel.fillRect(left,top+height-wallThickness,width,wallThickness);
+            panel.fillRect(px,py+NODE_SIZE-wallThickness,NODE_SIZE,wallThickness);
         if(this.wallWest())
-            panel.fillRect(left,top,wallThickness,height);
+            panel.fillRect(px,py,wallThickness,NODE_SIZE);
     }
     
     public boolean wallNorth(){

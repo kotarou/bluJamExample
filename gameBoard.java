@@ -10,7 +10,8 @@ import java.awt.*;
 
 public class gameBoard implements renderable
 {
-    public final int NODES_PER_SIDE = 16;
+    public final int NODES_PER_SIDE = 18;
+    public final int NODE_SIZE = 20;
     
     int left = 270;
     int top = 70;
