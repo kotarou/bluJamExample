@@ -12,6 +12,7 @@ import java.io.*;
 import java.awt.*;
 import javax.swing.*;
 
+
 public class game{
     // Game variables
     final int TARGET_FPS = 60;
@@ -31,6 +32,7 @@ public class game{
     
     double x = 0;
     ArrayList<renderable> renderComponents;
+    ArrayList<tickable> tickComponents;
     
     JFrame windowFrame;
     JRootPane windowRoot;
@@ -39,12 +41,15 @@ public class game{
     Graphics2D graphicsPanel;
     JPanel inputPanel;
     
+
+    
     /**      */
     public void run(){
         // Game timing
         long lastLoopTime = System.nanoTime();
 
         renderComponents = new ArrayList<>();
+        tickComponents = new ArrayList<>();
         
         UI.initialise();
         
@@ -93,17 +98,40 @@ public class game{
         windowFrame.pack();
         
         // Set up the in-game elements
-        renderComponents.add(new gameBoard());
-        renderComponents.add(new grad(0, 8, (gameBoard)renderComponents.get(0)));
+        gameBoard board = new gameBoard();
+        grad greg = new grad(2, 10, board);
+        renderComponents.add(board);
+        renderComponents.add(greg);
         
-        renderComponents.add(new wall(1, 7, (gameBoard)renderComponents.get(0)));
-        renderComponents.add(new wall(2, 6, (gameBoard)renderComponents.get(0)));
-        renderComponents.add(new wall(2, 5, (gameBoard)renderComponents.get(0)));
-        renderComponents.add(new wall(3, 3, (gameBoard)renderComponents.get(0)));
+        tickComponents.add(greg);
+        
+        for(int i = 0; i < board.NODES_PER_SIDE; i++){
+            renderComponents.add(new wall(0, i, board));
+            renderComponents.add(new wall(board.NODES_PER_SIDE-1, i, board));
+            renderComponents.add(new wall(i, 0, board));
+            renderComponents.add(new wall(i, board.NODES_PER_SIDE-1, board));
+        }
+        
+        
+        renderComponents.add(new wall(1, 7, board));
+        renderComponents.add(new wall(2, 6, board));
+        renderComponents.add(new wall(2, 5, board));
+        renderComponents.add(new wall(3, 3, board));
+        
+        renderComponents.add(new wall(14, 16, board));
+        renderComponents.add(new wall(15, 16, board));
+        renderComponents.add(new wall(16, 16, board));
+        renderComponents.add(new wall(17, 16, board));
+        renderComponents.add(new wall(18, 16, board));
         
         
         UI.setKeyListener(this::keyResponder);
         UI.setMouseListener(this::mouseResponder);
+        
+        //Stuff that needs to be at the end of setup.
+        greg.goalNode = board.nodes[17][17];
+        greg.setupPath();
+        
         
         while(gameRunning){
             int logicError=0, renderError=0;
@@ -145,14 +173,14 @@ public class game{
     public void keyResponder(String input){
         input = formatKey(input);
         
-        if(input.equals("w"))
+        /*if(input.equals("w"))
             ((grad)this.renderComponents.get(1)).attemptMove(0);
         if(input.equals("d"))
             ((grad)this.renderComponents.get(1)).attemptMove(1);
         if(input.equals("s"))
             ((grad)this.renderComponents.get(1)).attemptMove(2);
         if(input.equals("a"))
-            ((grad)this.renderComponents.get(1)).attemptMove(3); 
+            ((grad)this.renderComponents.get(1)).attemptMove(3); */
         
         System.out.println(input);
     }
@@ -169,6 +197,12 @@ public class game{
     
     public int gameLogic(double dt){
         x += 1;
+        
+        for(tickable t : tickComponents)
+            t.tick();
+        
+        
+        
         return 0;
     }
 
@@ -199,6 +233,10 @@ public class game{
         obj.run();
     }    
 
+    
+    
+    
+    
 }
 
 

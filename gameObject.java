@@ -45,9 +45,9 @@ public abstract class gameObject
      */
     public int valid(){
         // If the object will extend off the game board, return an error number.
-        if(this.parent.NODES_PER_SIDE <= (this.locX + lWidth))
+        if(this.parent.NODES_PER_SIDE < (this.locX + lWidth))
             return 1;
-        if(this.parent.NODES_PER_SIDE <= (this.locY + lHeight))
+        if(this.parent.NODES_PER_SIDE < (this.locY + lHeight))
             return 2;   
         return 0;
     }

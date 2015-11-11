@@ -27,6 +27,9 @@ public class wall extends gameObject implements renderable
             throw new RuntimeException("Invalid wall!");
         
         this.setupCoverNodes();
+        
+        for(node n : this.nodes)
+            n.passable = false;
     }
     
     public void render(Graphics2D panel){

@@ -1,5 +1,8 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.PriorityQueue;
+import java.util.ArrayList;
+import java.util.LinkedList;
 /**
  * class grad
  * A grad is a token that moves around the gameboard, seeking coffee, 
@@ -8,7 +11,7 @@ import java.awt.Graphics2D;
  * @author kotarou 
  */
 
-public class grad implements renderable 
+public class grad extends gameObject implements renderable, tickable 
 {
     // But wait you ask, why are these doubles while the game board is a grid!!??
     // The grid is only for placement of objects and visual nicety (and because it makes pathfinding easy).
@@ -19,22 +22,65 @@ public class grad implements renderable
     public double posY;
     public double radius;
     public Color tokenColor;
-
-    private gameBoard board;
-
+    public int velocity = 10;
+    
+    //public PriorityQueue<node> pathableNodes;
+    public ArrayList<node> nodeList;
+    public ArrayList<Double> distList;
+    public ArrayList<node> prevList;
+    
+    public LinkedList<node> path;
+    
+    public node currentNode;
+    
+    public node goalNode;
+    
+    public boolean active;
+    
     /**
      * Constructor for objects of class grad
      */
-    public grad(int posX, int posY, gameBoard board)
+    public grad(int locX, int locY, gameBoard board)
     {      
-        // The starting position, as an offset from the top left of the game board        
-        this.posX = board.nodes[posX][posY].posX+4;
-        this.posY = board.nodes[posX][posY].posY+3;
+        this.active = true;
+        
+        this.anchor = 1;
+        // The grad token can be in multiple nodes, depending on its exact position.
+        // This does not count as covering a node.
+        // A grad is circular (for now) and has no mask
+        
+        this.parent = board;
+        
+        this.locX = locX;
+        this.locY = locY;
+        
+        // For initial setup, we stick it in the center of a node
+        this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
+        this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
 
-        this.board = board;
-
-        this.radius = 7;
+        this.radius = 3;
         this.tokenColor = Color.BLUE;
+        
+        nodeList = new ArrayList<>();
+        distList = new ArrayList<>();
+        prevList = new ArrayList<>();
+        
+        path = new LinkedList<>();
+        // End location: (17,17)
+        // First, set up the list of nodes.
+        //pathableNodes = new PriorityQueue<>();
+        for(int i = 0; i < parent.NODES_PER_SIDE; i++){
+            for(int j = 0; j < parent.NODES_PER_SIDE; j++){
+                //pathableNodes.offer(parent.nodes[i][j]);
+                if(parent.nodes[i][j].passable){
+                    nodeList.add(parent.nodes[i][j]);
+
+                }
+            }
+        }
+ 
+        currentNode = parent.nodes[this.locX][this.locY];
+        currentNode.pathingDist = 0.0;
     }
 
     public void render(Graphics2D panel){
@@ -42,73 +88,124 @@ public class grad implements renderable
         panel.fillOval((int)(this.posX-this.radius), (int)(this.posY-this.radius), (int)this.radius*2, (int)this.radius*2);
 
     }
-
-    public void attemptMove(int direction){
-        // the int direction should be made into a direction class at some point
-        node currentNode = this.getCurrentNode();
-        double d = distToEdge(currentNode, direction);
-        System.out.println("d: " + d + " PosX: " + this.posX + " PosY: " + this.posY);
-
-        if(direction==0){
-            if(currentNode.north != null || d > 10)
-                this.move(0, 10);
-            else if ((currentNode.north == null && d > 0) || currentNode.north != null)
-                this.move(0, d);
+    // Pathfinding!!
+    
+    // In keeping with the general idea of tower-defense style games, the path-finding abilities
+    // of a grad are limited (on easy levels) to a greedy best-first pathfinding. 
+    
+    // The heuristic cost of getting to a node is the euclidean distance to the goal
+    public node smallest(ArrayList<node> arr){
+        node index = null;
+        double smallest = Double.MAX_VALUE;
+        for(node n : arr)
+        {
+            if(n.pathingDist <= smallest)
+            {
+                smallest = n.pathingDist;
+                index = n;
+            }
         }
-        if(direction==1){
-            if(currentNode.east != null || d > 10)
-                this.move(1, 10);
-            else if ((currentNode.east == null && d > 0) || currentNode.east != null)
-                this.move(1, d);
+        //System.out.println(smallest);
+        return index;
+    }
+    
+    public void setupPath(){
+        
+        while(nodeList.isEmpty()== false)
+        {
+            currentNode = smallest(nodeList);
+            nodeList.remove(currentNode);
+            
+                    
+            double alt = 0;
+            //System.out.println("Node: ("+currentNode.locX+","+currentNode.locY+")");
+            alt = currentNode.pathingDist + 1;
+            if(currentNode.north != null && currentNode.north.passable && alt < currentNode.north.pathingDist)
+            {
+                currentNode.north.pathingDist = alt;
+                currentNode.north.pathingPrev = currentNode;
+            }
+            if(currentNode.east != null && currentNode.east.passable && alt < currentNode.east.pathingDist)
+            {
+                currentNode.east.pathingDist = alt;
+                currentNode.east.pathingPrev = currentNode;
+            }
+            if(currentNode.south != null && currentNode.south.passable && alt < currentNode.south.pathingDist)
+            {
+                currentNode.south.pathingDist = alt;
+                currentNode.south.pathingPrev = currentNode;
+            }
+            if(currentNode.west != null && currentNode.west.passable && alt < currentNode.west.pathingDist)
+            {
+                currentNode.west.pathingDist = alt;
+                currentNode.west.pathingPrev = currentNode;
+            }
         }
-        if(direction==2){
-            if(currentNode.south != null || d > 10)
-                this.move(2, 10);
-            else if ((currentNode.south == null && d > 0) || currentNode.south != null)
-                this.move(2, d);
+        
+        node tNode = goalNode;
+        
+        while(tNode.pathingPrev != null)
+        {
+            path.addFirst(tNode);
+            tNode = tNode.pathingPrev;
         }
-        if(direction==3){
-            if(currentNode.west != null || d > 10)
-                this.move(3, 10);
-            else if ((currentNode.west == null && d > 0) || currentNode.west != null)
-                this.move(3, d);
+        //System.out.println(path);
+    }
+    
+    
+    public void tick(){
+        if(!this.active)
+            return;
+       
+        if(currentNode.locX == goalNode.locX && currentNode.locY == goalNode.locY)
+        {
+            System.out.println("Made it!");
+            this.active = false;
+            return;
         }
+        
+        if(path.size() > 0)
+            this.moveToNode(path.poll());
+
+        
+        /*    
+        
+        if(goalNode.north != null && goalNode.north.passable && !pathableNodes.contains(goalNode.north) && !closedNodes.contains(goalNode.north))
+            pathableNodes.offer(goalNode.north);
+        
+        if(goalNode.east != null && goalNode.east.passable && !pathableNodes.contains(goalNode.east) && !closedNodes.contains(goalNode.east))
+            pathableNodes.offer(goalNode.east);
+        
+        if(goalNode.south != null && goalNode.south.passable && !pathableNodes.contains(goalNode.south) && !closedNodes.contains(goalNode.south))
+            pathableNodes.offer(goalNode.south);
+        
+        if(goalNode.west != null && goalNode.west.passable && !pathableNodes.contains(goalNode.west) && !closedNodes.contains(goalNode.west))
+            pathableNodes.offer(goalNode.west);
+        */
+        }
+        
+            
+        /*// If we have made it, stop
+
+        //System.out.println("At: "+this.locX + " " + this.locY);
+        // Add any new reachable nodes
+        addNodes(currentNode);
+        // Move to the best node 
+        // Needs to be a pathable node!
+        currentNode = pathableNodes.poll();
+        this.moveToNode(currentNode); 
     }
-
-    public void move(int direction, double distance){
-        if(direction == 0)
-            this.posY -= distance;
-        if(direction == 1)
-            this.posX += distance;
-        if(direction == 2)
-            this.posY += distance;
-        if(direction == 3)
-            this.posX -= distance;
+    
+    
+    */
+    public void moveToNode(node target){
+        this.locX = target.locX;
+        this.locY = target.locY;
+        
+        // For initial setup, we stick it in the center of a node
+        this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
+        this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
+        
     }
-
-    public node getCurrentNode(){
-        // Hard coded values are bad. This method is a bit of a hack, I will clean it up later.
-        int i = (int)Math.floor((this.posX - (board.left)) / 22);
-        int j = (int)Math.floor((this.posY - (board.top)) / 22);
-        if( i  < 0 || j < 0 )
-            throw new RuntimeException("Invalid node");
-        System.out.println("Node: " +i + j);
-        return this.board.nodes[i][j];
-    }
-
-    public double distToEdge(node currentNode, int edge){
-        // A node is bounded by node.top, node.left, node.top+height, node.left+width
-        // dist to edge is positive if you are within the node, negative otherwise
-        if(edge == 0)
-            return (this.posY-(this.radius+currentNode.posY));
-        if(edge == 1)
-            return ((currentNode.posX+currentNode.NODE_SIZE)-(this.posX+this.radius));
-        if(edge == 2)
-            return ((currentNode.posY+currentNode.NODE_SIZE)-(this.posY+this.radius));
-        if(edge == 3)
-            return ((this.posX-this.radius)-currentNode.posX);
-
-        return -10;
-    }
-
+    
 }

@@ -7,18 +7,18 @@
 
 import java.awt.*;
 
-public class node extends gameObject implements renderable
+public class node extends gameObject implements renderable, Comparable<node>
 {
 
+    public double pathingDist = Double.MAX_VALUE-10;
+    public node pathingPrev = null;
+    
+    
     public final int NODE_SIZE;
     
     int hOffset = 1;
     int wOffset = 1;
     
-    int wallThickness = 2;
-    //int borderWidth = 1;
-    
-    Color wallColor = Color.WHITE;
     Color nodeColor = Color.RED;
         
     // Top, right, bottom, left borders.
@@ -26,6 +26,8 @@ public class node extends gameObject implements renderable
     public node north, east, south, west;
     
     public int contents = 0;
+    
+    public boolean isBorder = false;
     
     /**
      * Constructor
@@ -45,10 +47,6 @@ public class node extends gameObject implements renderable
         
         this.posX = parent.left + (this.locX*NODE_SIZE) + ((this.locX+1)*wOffset);
         this.posY = parent.top + (this.locY*NODE_SIZE) + ((this.locY+1)*hOffset);
-        
-        
-
-        
 
             
     }
@@ -89,19 +87,8 @@ public class node extends gameObject implements renderable
     
     
     public void render(Graphics2D panel){
-        panel.setColor(nodeColor);
-        int px = (int)this.posX;
-        int py = (int)this.posY;
-        panel.fillRect(px, py, NODE_SIZE, NODE_SIZE);
-        panel.setColor(wallColor);
-        if(this.wallNorth())
-            panel.fillRect(px,py,NODE_SIZE,wallThickness);
-        if(this.wallEast())
-            panel.fillRect(px+NODE_SIZE-wallThickness,py,wallThickness,NODE_SIZE);
-        if(this.wallSouth())
-            panel.fillRect(px,py+NODE_SIZE-wallThickness,NODE_SIZE,wallThickness);
-        if(this.wallWest())
-            panel.fillRect(px,py,wallThickness,NODE_SIZE);
+        panel.setColor(this.nodeColor);
+        panel.fillRect((int)this.posX, (int)this.posY, NODE_SIZE, NODE_SIZE);
     }
     
     public boolean wallNorth(){
@@ -115,6 +102,15 @@ public class node extends gameObject implements renderable
     }    
     public boolean wallWest(){
         return this.west == null;
+    }
+    
+    /*
+     * Basic heurisitc for path finding
+     */
+    public int compareTo(node other){
+        // TODO use a non-hardcoded goal
+        return (int)(Math.sqrt(Math.pow((this.locX-17),2) + Math.pow((this.locY-17),2)) -
+                Math.sqrt(Math.pow((other.locX-17),2) + Math.pow((other.locY-17),2)));
     }
     
 }
