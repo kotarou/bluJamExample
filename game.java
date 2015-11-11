@@ -105,25 +105,20 @@ public class game{
         
         tickComponents.add(greg);
         
-        for(int i = 0; i < board.NODES_PER_SIDE; i++){
-            renderComponents.add(new wall(0, i, board));
-            renderComponents.add(new wall(board.NODES_PER_SIDE-1, i, board));
-            renderComponents.add(new wall(i, 0, board));
-            renderComponents.add(new wall(i, board.NODES_PER_SIDE-1, board));
-        }
+        // Wall boundaries around level
+        renderComponents.add(new wall(0, 0, board.NODES_PER_SIDE, 1, board));
+        renderComponents.add(new wall(board.NODES_PER_SIDE-1, 0, 1, board.NODES_PER_SIDE, board));
+        renderComponents.add(new wall(0, board.NODES_PER_SIDE-1, board.NODES_PER_SIDE, 1, board));
+        renderComponents.add(new wall(0, 0, 1, board.NODES_PER_SIDE, board));
         
+        renderComponents.add(new wall(1, 7, 1, 1, board));
+        renderComponents.add(new wall(2, 6, 1, 1, board));
+        renderComponents.add(new wall(2, 5, 1, 1, board));
+        renderComponents.add(new wall(3, 3, 1, 1, board));
         
-        renderComponents.add(new wall(1, 7, board));
-        renderComponents.add(new wall(2, 6, board));
-        renderComponents.add(new wall(2, 5, board));
-        renderComponents.add(new wall(3, 3, board));
-        
-        renderComponents.add(new wall(14, 16, board));
-        renderComponents.add(new wall(15, 16, board));
-        renderComponents.add(new wall(16, 16, board));
-        renderComponents.add(new wall(17, 16, board));
-        renderComponents.add(new wall(18, 16, board));
-        
+        renderComponents.add(new wall(14, 16, 10, 1, board));
+        renderComponents.add(new wall(12, 11, 3, 11, board));
+        renderComponents.add(new wall(14, 20, 10, 1, board));
         
         UI.setKeyListener(this::keyResponder);
         UI.setMouseListener(this::mouseResponder);
