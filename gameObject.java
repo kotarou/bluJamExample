@@ -62,23 +62,23 @@ public abstract class gameObject
         {
             for(int i = this.locX; i < this.locX+lWidth; i++)
                 for(int j = this.locY; j < this.locY+lHeight; j++)
-                    this.nodes.add(this.parent.nodes[i][j]);
+                    this.nodes.add(this.parent.nodes[j][i]);
         }
         else
         {
         // Check each entry in the mask, and if it is a 1, add the node that part of this object covers
         for(int i = 0; i < lWidth; i++)
             for(int j = 0; j < lHeight; j++)
-                if(this.shapeMask[i][j] == 1)
-                    this.nodes.add(this.parent.nodes[i][j]);
+                if(this.shapeMask[j][i] == 1)
+                    this.nodes.add(this.parent.nodes[j][i]);
         }
     }
     
     public double getPosXFromLoc(){
-        return this.parent.nodes[locX][locY].posX;
+        return this.parent.nodes[locY][locX].posX;
     }
     
     public double getPosYFromLoc(){
-        return this.parent.nodes[locX][locY].posY;
+        return this.parent.nodes[locY][locX].posY;
     }
 }

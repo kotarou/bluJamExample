@@ -60,25 +60,25 @@ public class node extends gameObject implements renderable, Comparable<node>
    public void createLinks(){
         // north relation
         if(this.locY > 0)
-            this.north = this.parent.nodes[this.locX][this.locY-1];
+            this.north = this.parent.nodes[this.locY-1][this.locX];
         else
             this.north = null;
         
         // east relation
         if(this.locX < this.parent.NODES_PER_SIDE - 1)
-            this.east = this.parent.nodes[this.locX+1][this.locY];
+            this.east = this.parent.nodes[this.locY][this.locX+1];
         else
             this.east = null;
          
         // south relation
         if(this.locY < this.parent.NODES_PER_SIDE - 1)
-            this.south = this.parent.nodes[this.locX][this.locY+1];
+            this.south = this.parent.nodes[this.locY+1][this.locX];
         else
             this.south = null; 
             
         // west relation
         if(this.locX > 0)
-            this.west = this.parent.nodes[this.locX-1][this.locY];
+            this.west = this.parent.nodes[this.locY][this.locX-1];
         else
             this.west = null;    
 

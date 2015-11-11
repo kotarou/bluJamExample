@@ -29,12 +29,12 @@ public class gameBoard implements renderable
         this.nodes = new node[NODES_PER_SIDE][NODES_PER_SIDE];
         for(int i = 0; i < NODES_PER_SIDE; i++){
             for(int j = 0; j < NODES_PER_SIDE; j++){
-                this.nodes[i][j] = new node(this, i, j);
+                this.nodes[j][i] = new node(this, i, j);
             }
         }
         for(int i = 0; i < NODES_PER_SIDE; i++){
             for(int j = 0; j < NODES_PER_SIDE; j++){
-                this.nodes[i][j].createLinks();
+                this.nodes[j][i].createLinks();
             }
         }
     }
@@ -43,7 +43,7 @@ public class gameBoard implements renderable
         panel.fillRect(left, top, width, height);
         for(int i = 0; i < NODES_PER_SIDE; i++){
             for(int j = 0; j < NODES_PER_SIDE; j++){
-                this.nodes[i][j].render(panel);
+                this.nodes[j][i].render(panel);
             }
         }
     }

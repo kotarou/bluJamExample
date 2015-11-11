@@ -99,7 +99,7 @@ public class game{
         
         // Set up the in-game elements
         gameBoard board = new gameBoard();
-        grad greg = new grad(2, 10, board);
+        grad greg = new grad(3, 4, board);
         renderComponents.add(board);
         renderComponents.add(greg);
         
@@ -111,10 +111,15 @@ public class game{
         renderComponents.add(new wall(0, board.NODES_PER_SIDE-1, board.NODES_PER_SIDE, 1, board));
         renderComponents.add(new wall(0, 0, 1, board.NODES_PER_SIDE, board));
         
-        renderComponents.add(new wall(1, 7, 1, 1, board));
-        renderComponents.add(new wall(2, 6, 1, 1, board));
-        renderComponents.add(new wall(2, 5, 1, 1, board));
-        renderComponents.add(new wall(3, 3, 1, 1, board));
+        int[][] mask = {{1, 1, 1, 1, 1, 1, 0, 0}, 
+                        {0, 0, 0, 0, 0, 1, 0, 1},
+                        {0, 1, 1, 1, 0, 1, 0, 1},
+                        {0, 1, 0, 0, 0, 0, 0, 0},
+                        {0, 1, 1, 1, 1, 1, 0, 1},
+                        {0, 0, 0, 0, 0, 0, 0, 1},
+                        {1, 1, 1, 1, 1, 1, 1, 1},};
+        renderComponents.add(new wall(1, 1, mask, board));
+
         
         renderComponents.add(new wall(14, 16, 10, 1, board));
         renderComponents.add(new wall(12, 11, 3, 11, board));

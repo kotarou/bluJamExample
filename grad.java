@@ -149,7 +149,14 @@ public class grad extends gameObject implements renderable, tickable
             path.addFirst(tNode);
             tNode = tNode.pathingPrev;
         }
-        //System.out.println(path);
+        
+        if(path.size() == 0)
+        {
+            //TODO: Make this actually do something
+            // TODO: Fix bug where this occurs when it shouldn't. 
+            System.out.println("Grad cannot do anything");
+        }
+        
     }
     
     
@@ -166,42 +173,12 @@ public class grad extends gameObject implements renderable, tickable
         
         if(path.size() > 0)
             this.moveToNode(path.poll());
-
-        
-        /*    
-        
-        if(goalNode.north != null && goalNode.north.passable && !pathableNodes.contains(goalNode.north) && !closedNodes.contains(goalNode.north))
-            pathableNodes.offer(goalNode.north);
-        
-        if(goalNode.east != null && goalNode.east.passable && !pathableNodes.contains(goalNode.east) && !closedNodes.contains(goalNode.east))
-            pathableNodes.offer(goalNode.east);
-        
-        if(goalNode.south != null && goalNode.south.passable && !pathableNodes.contains(goalNode.south) && !closedNodes.contains(goalNode.south))
-            pathableNodes.offer(goalNode.south);
-        
-        if(goalNode.west != null && goalNode.west.passable && !pathableNodes.contains(goalNode.west) && !closedNodes.contains(goalNode.west))
-            pathableNodes.offer(goalNode.west);
-        */
         }
-        
-            
-        /*// If we have made it, stop
 
-        //System.out.println("At: "+this.locX + " " + this.locY);
-        // Add any new reachable nodes
-        addNodes(currentNode);
-        // Move to the best node 
-        // Needs to be a pathable node!
-        currentNode = pathableNodes.poll();
-        this.moveToNode(currentNode); 
-    }
-    
-    
-    */
     public void moveToNode(node target){
         this.locX = target.locX;
         this.locY = target.locY;
-        
+        System.out.println("Location: (" + this.locX + "," + this.locY+")");
         // For initial setup, we stick it in the center of a node
         this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
         this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
