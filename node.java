@@ -15,10 +15,7 @@ public class node extends gameObject implements renderable, Comparable<node>
     public String type;
     
     public final int NODE_SIZE;
-    
-    int hOffset = 1;
-    int wOffset = 1;
-    
+       
     Color nodeColor;
         
     public node north, east, south, west;
@@ -46,8 +43,8 @@ public class node extends gameObject implements renderable, Comparable<node>
         this.locX = locX;
         this.locY = locY;
         
-        this.posX = parent.left + (this.locX*NODE_SIZE) + ((this.locX+1)*wOffset);
-        this.posY = parent.top + (this.locY*NODE_SIZE) + ((this.locY+1)*hOffset);
+        this.posX = parent.left + (this.locX*NODE_SIZE) + ((this.locX+1)*parent.H_OFFSET);
+        this.posY = parent.top + (this.locY*NODE_SIZE) + ((this.locY+1)*parent.W_OFFSET);
 
         this.type = type;   
         

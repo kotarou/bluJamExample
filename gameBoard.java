@@ -13,6 +13,9 @@ public class gameBoard implements renderable
     public final int NODES_PER_SIDE = 36;
     public final int NODE_SIZE = 10;
     
+    public final int H_OFFSET = 1;
+    public final int W_OFFSET = 1;
+    
     int left = 270;
     int top = 70;
     int width = 400;

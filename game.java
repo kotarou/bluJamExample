@@ -41,6 +41,7 @@ public class game{
     Graphics2D graphicsPanel;
     JPanel inputPanel;
     
+    gameBoard board;
 
     
     /**      */
@@ -98,7 +99,7 @@ public class game{
         windowFrame.pack();
         
         // Set up the in-game elements
-        gameBoard board = new gameBoard();
+        board = new gameBoard();
         grad greg = new grad(10, 20, board);
         renderComponents.add(board);
         renderComponents.add(greg);
@@ -190,6 +191,25 @@ public class game{
     
     public void mouseResponder(String action, double x, double y){
         System.out.println("Mouse x: " + x + " y: " + y);
+        
+        // Fimd out what tile is under the mouse
+        int locX = getLocXFromPos(x);
+        int locY = getLocYFromPos(y);
+        System.out.println("Locx: " + locX + " LocY: " + locY);
+        //if(locX > 0 && locY > 0)
+            
+    }
+    
+    public int getLocXFromPos(double x){
+        if(x < board.left || x > board.left + board.width)
+            return -1;
+        return (int)Math.floor((x - board.left) / (board.NODE_SIZE+board.W_OFFSET));
+    }
+
+    public int getLocYFromPos(double y){
+        if(y < board.top || y > board.top + board.height)
+            return -1;
+        return (int)Math.floor((y - board.top) / (board.NODE_SIZE+board.H_OFFSET));
     }
     
     public String formatKey(String input){
