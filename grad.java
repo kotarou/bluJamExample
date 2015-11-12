@@ -38,6 +38,9 @@ public class grad extends gameObject implements renderable, tickable
     
     public boolean active;
     
+    public double maxEnergy;
+    public double energy;
+    
     /**
      * Constructor for objects of class grad
      */

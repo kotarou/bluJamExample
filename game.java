@@ -11,7 +11,9 @@ import java.io.*;
 
 import java.awt.*;
 import javax.swing.*;
+import java.awt.event.*;
 
+//import java.lang.reflect.*;
 
 public class game{
     // Game variables
@@ -40,15 +42,21 @@ public class game{
     // The graphics panel needs to be grabbed every frame. 
     Graphics2D graphicsPanel;
     JPanel inputPanel;
+    JPopupMenu popup;
+    
     
     gameBoard board;
     grad greg;
+    
+    String mouseAttachment;
     
     /**      */
     public void run(){
         // Game timing
         long lastLoopTime = System.nanoTime();
 
+        mouseAttachment = "";
+        
         renderComponents = new ArrayList<>();
         tickComponents = new ArrayList<>();
         
@@ -97,7 +105,7 @@ public class game{
         // Don't draw grpahics immediately. 
         UI.setImmediateRepaint(false);
         
-        windowFrame.pack();
+        
         
         // Set up the in-game elements
         board = new gameBoard();
@@ -132,9 +140,27 @@ public class game{
         renderComponents.add(new wall(12, 11, 3, 11, board));
         renderComponents.add(new wall(14, 20, 10, 1, board));
         
-        UI.setKeyListener(this::keyResponder);
-        UI.setMouseListener(this::mouseResponder);
+        renderComponents.add(new container(50, 50, 2, "wall (1x5)"));
+        renderComponents.add(new container(50, 100, 3, "wall (5x1)"));
         
+        UI.setKeyListener(this::keyResponder);
+        UI.setMouseMotionListener(this::mouseResponder);
+        
+        /*
+        popup = new JPopupMenu();
+        JMenuItem m1 = new JMenuItem("Wall");
+        popup.add(m1);*/
+        
+        //windowFrame.addMouseListener(new mouseResponder());
+        
+        // May need some relection....
+        /*Field field = UI.class.getDeclaredField("canvas");
+        field.setAccessible(true);
+        Object value = field.get(UI.theUI);
+        System.out.println(value);*/
+        //windowFrame.addMouseListener(new mouseResponder());
+        
+        windowFrame.pack();
         start();
         
         
@@ -202,16 +228,73 @@ public class game{
     }
     
     public void mouseResponder(String action, double x, double y){
-        System.out.println("Mouse x: " + x + " y: " + y);
-        
         // Fimd out what tile is under the mouse
         int locX = getLocXFromPos(x);
         int locY = getLocYFromPos(y);
-        System.out.println("Locx: " + locX + " LocY: " + locY);
-        if(locX > 0 && locY > 0)
-            board.nodes[locY][locX].setType("wall");
         
+        
+        
+        if(action.equals("clicked"))
+        {
+            System.out.println("Mouse x: " + x + " y: " + y + " action: " + action);
+        }
+        
+        if(action.equals("pressed"))
+        {
+            // Find out if we have clicked in a container
+            for(renderable r : renderComponents)
+            {
+                if(r instanceof container)
+                {
+                    // Ugly cast, but it works
+                    container t = (container) r;
+                    if( x < t.posX || x > t.posX+100 || y < t.posY || y > t.posY+40)
+                        continue;
+                    else
+                    {
+                        // We have clicked within the container
+                        if(t.current > 0)
+                        {
+                            t.current -= 1;
+                            mouseAttachment = t.type;
+                        }
+                    }
+                }
+            }
             
+        }
+        
+         if(action.equals("released"))
+        {
+            if(mouseAttachment.length() > 0)
+            {
+                System.out.println("Locx: " + locX + " LocY: " + locY);
+                if(locX > 0 && locY > 0) 
+                {
+                    if(mouseAttachment.equals("wall (5x1)"))
+                    {
+                        for(int i = locX; i < locX + 5; i++)
+                        {
+                            if( i < board.NODES_PER_SIDE){
+                                board.nodes[locY][i].setType("wall");
+                            }
+                        }
+                    }
+                    if(mouseAttachment.equals("wall (1x5)"))
+                    {
+                        for(int i = locY; i < locY + 5; i++)
+                        {
+                            if( i < board.NODES_PER_SIDE){
+                                board.nodes[i][locX].setType("wall");
+                            }
+                        }
+                    }                        
+                    
+                    mouseAttachment = "";
+                }
+            }
+            //popup.setVisible(false);
+        }    
     }
     
     public int getLocXFromPos(double x){
@@ -232,15 +315,11 @@ public class game{
         return input.toLowerCase();
     }
     
-    public int gameLogic(double dt){
-        x += 1;
-        
+    public int gameLogic(double dt){      
         for(tickable t : tickComponents)
             t.tick();
-        
-        
-        
-        return 0;
+
+            return 0;
     }
 
     public int gameRender(){
@@ -249,7 +328,6 @@ public class game{
         UI.clearGraphics();
         graphicsPanel = UI.getGraphics();
         graphicsPanel.setColor(Color.BLACK);
-        UI.drawRect(100+x,100,50,50);
         // FPS counter
         UI.drawString(String.format("FPS: %4.2f", fps), 20, 30);
         
@@ -275,8 +353,6 @@ public class game{
     
     
 }
-
-
 
 
 
