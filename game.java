@@ -99,9 +99,12 @@ public class game{
         
         // Set up the in-game elements
         gameBoard board = new gameBoard();
-        grad greg = new grad(3, 4, board);
+        grad greg = new grad(10, 20, board);
         renderComponents.add(board);
         renderComponents.add(greg);
+        
+        board.nodes[10][20].setType("start");
+        board.nodes[17][17].setType("goal");
         
         tickComponents.add(greg);
         

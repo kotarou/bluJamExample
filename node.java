@@ -12,27 +12,28 @@ public class node extends gameObject implements renderable, Comparable<node>
 
     public double pathingDist = Double.MAX_VALUE-10;
     public node pathingPrev = null;
-    
+    public String type;
     
     public final int NODE_SIZE;
     
     int hOffset = 1;
     int wOffset = 1;
     
-    Color nodeColor = Color.RED;
+    Color nodeColor;
         
-    // Top, right, bottom, left borders.
-    // 1 = impassable, 0 = passable.
     public node north, east, south, west;
     
-    public int contents = 0;
-    
+   
     public boolean isBorder = false;
     
     /**
      * Constructor
      */
-    public node(gameBoard parent, int locX, int locY)
+    public node(gameBoard parent, int locX, int locY) {
+        this(parent, locX, locY, "floor");
+    }
+    
+    public node(gameBoard parent, int locX, int locY, String type)
     {
         // The anchor of a node is the default, top left
         // A node covers no other nodes, and it seems meaningless for a node to cover itself.
@@ -48,9 +49,27 @@ public class node extends gameObject implements renderable, Comparable<node>
         this.posX = parent.left + (this.locX*NODE_SIZE) + ((this.locX+1)*wOffset);
         this.posY = parent.top + (this.locY*NODE_SIZE) + ((this.locY+1)*hOffset);
 
-            
+        this.type = type;   
+        
+        this.setType();
     }
 
+    public void setType(){
+        this.setType(this.type);
+    }
+    
+    public void setType(String type){
+        // This is a doubleup in some cases.
+        this.type = type;
+        
+        if(this.type.equals("floor"))
+            this.nodeColor = Color.WHITE;
+        if(this.type.equals("goal"))
+            this.nodeColor = Color.RED;
+        if(this.type.equals("start"))
+            this.nodeColor = Color.BLUE;
+    }
+    
    /**
     * void createlinks()
     * This method creates an effective 2D linkedlist of nodes within the parent gameboard.
