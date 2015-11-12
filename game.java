@@ -140,8 +140,8 @@ public class game{
         renderComponents.add(new wall(12, 11, 3, 11, board));
         renderComponents.add(new wall(14, 20, 10, 1, board));
         
-        renderComponents.add(new container(50, 50, 2, "wall (1x5)"));
-        renderComponents.add(new container(50, 100, 3, "wall (5x1)"));
+        renderComponents.add(new container(50, 60, 2, "wall (1x5)"));
+        renderComponents.add(new container(50, 110, 3, "wall (5x1)"));
         
         UI.setKeyListener(this::keyResponder);
         UI.setMouseMotionListener(this::mouseResponder);
@@ -204,6 +204,7 @@ public class game{
     public void start(){
         //Stuff that needs to be at the end of setup.
         greg.goalNodes = new LinkedList<>();
+        greg.energy = greg.maxEnergy;
         
         greg.addGoal(17, 17);
         greg.addGoal(30, 30);
@@ -330,6 +331,7 @@ public class game{
         graphicsPanel.setColor(Color.BLACK);
         // FPS counter
         UI.drawString(String.format("FPS: %4.2f", fps), 20, 30);
+        UI.drawString(String.format("Grad energy: %4.2f", greg.energy), 20, 50);
         
         
         

@@ -68,6 +68,9 @@ public class grad extends gameObject implements renderable, tickable
         nodeList = new ArrayList<>();
         goalNodes = new LinkedList<>();
         path = new LinkedList<>();
+        
+        this.maxEnergy = 100.0;
+        this.energy = maxEnergy;
 
     }
 
@@ -192,7 +195,16 @@ public class grad extends gameObject implements renderable, tickable
         }
         
         if(path.size() > 0)
-            this.moveToNode(path.poll());
+            if(this.energy > 0)
+            {
+                this.moveToNode(path.poll());
+                this.energy -= 1;
+            }
+            else
+            {
+                System.out.println("Grad has run out of energy!");
+                this.active = false;
+            }
         }
 
     public void moveToLocation(int x, int y){
