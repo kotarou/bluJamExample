@@ -62,25 +62,9 @@ public class grad extends gameObject implements renderable, tickable
         this.tokenColor = Color.BLUE;
         
         nodeList = new ArrayList<>();
-        distList = new ArrayList<>();
-        prevList = new ArrayList<>();
         
         path = new LinkedList<>();
-        // End location: (17,17)
-        // First, set up the list of nodes.
-        //pathableNodes = new PriorityQueue<>();
-        for(int i = 0; i < parent.NODES_PER_SIDE; i++){
-            for(int j = 0; j < parent.NODES_PER_SIDE; j++){
-                //pathableNodes.offer(parent.nodes[i][j]);
-                if(parent.nodes[i][j].passable){
-                    nodeList.add(parent.nodes[i][j]);
 
-                }
-            }
-        }
- 
-        currentNode = parent.nodes[this.locX][this.locY];
-        currentNode.pathingDist = 0.0;
     }
 
     public void render(Graphics2D panel){
@@ -110,6 +94,24 @@ public class grad extends gameObject implements renderable, tickable
     }
     
     public void setupPath(){
+        nodeList.clear();
+        path.clear();
+        
+        // End location: (17,17)
+        // First, set up the list of nodes.
+        //pathableNodes = new PriorityQueue<>();
+        for(int i = 0; i < parent.NODES_PER_SIDE; i++){
+            for(int j = 0; j < parent.NODES_PER_SIDE; j++){
+                parent.nodes[i][j].resetPathing();
+                if(parent.nodes[i][j].passable){
+                    nodeList.add(parent.nodes[i][j]);
+
+                }
+            }
+        }
+ 
+        currentNode = parent.nodes[this.locX][this.locY];
+        currentNode.pathingDist = 0.0;
         
         while(nodeList.isEmpty()== false)
         {
@@ -175,6 +177,15 @@ public class grad extends gameObject implements renderable, tickable
             this.moveToNode(path.poll());
         }
 
+    public void moveToLocation(int x, int y){
+        this.locX = x;
+        this.locY = y;
+        System.out.println("Location: (" + this.locX + "," + this.locY+")");
+        // For initial setup, we stick it in the center of a node
+        this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
+        this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
+    }
+        
     public void moveToNode(node target){
         this.locX = target.locX;
         this.locY = target.locY;

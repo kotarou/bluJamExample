@@ -51,6 +51,11 @@ public class node extends gameObject implements renderable, Comparable<node>
         this.setType();
     }
 
+    public void resetPathing(){
+        pathingDist = Double.MAX_VALUE-10;
+        pathingPrev = null;
+    }
+    
     public void setType(){
         this.setType(this.type);
     }
@@ -65,6 +70,10 @@ public class node extends gameObject implements renderable, Comparable<node>
             this.nodeColor = Color.RED;
         if(this.type.equals("start"))
             this.nodeColor = Color.BLUE;
+        if(this.type.equals("wall")){
+            this.nodeColor = Color.BLACK;
+            this.passable = false;
+        }
     }
     
    /**
@@ -108,16 +117,16 @@ public class node extends gameObject implements renderable, Comparable<node>
     }
     
     public boolean wallNorth(){
-        return this.north == null;
+        return this.north == null || !this.north.passable;
     }    
     public boolean wallSouth(){
-        return this.south == null;
+        return this.south == null || !this.south.passable;
     }    
     public boolean wallEast(){
-        return this.east == null;
+        return this.east == null || !this.east.passable;
     }    
     public boolean wallWest(){
-        return this.west == null;
+        return this.west == null || !this.west.passable;
     }
     
     /*

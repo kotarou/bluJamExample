@@ -42,7 +42,7 @@ public class game{
     JPanel inputPanel;
     
     gameBoard board;
-
+    grad greg;
     
     /**      */
     public void run(){
@@ -75,6 +75,7 @@ public class game{
         //inputPanel.setSize(new Dimension(100,500));
         
         UI.addButton("Spawn Next Level", UI::quit);
+        UI.addButton("Restart", this::start);
         UI.addButton("Quit", UI::quit);
         
 
@@ -100,7 +101,7 @@ public class game{
         
         // Set up the in-game elements
         board = new gameBoard();
-        grad greg = new grad(10, 20, board);
+        greg = new grad(10, 20, board);
         renderComponents.add(board);
         renderComponents.add(greg);
         
@@ -132,9 +133,7 @@ public class game{
         UI.setKeyListener(this::keyResponder);
         UI.setMouseListener(this::mouseResponder);
         
-        //Stuff that needs to be at the end of setup.
-        greg.goalNode = board.nodes[17][17];
-        greg.setupPath();
+        start();
         
         
         while(gameRunning){
@@ -174,6 +173,13 @@ public class game{
         }
     }
 
+    public void start(){
+        //Stuff that needs to be at the end of setup.
+        greg.goalNode = board.nodes[17][17];
+        greg.moveToLocation(10,20);
+        greg.setupPath();
+    }
+    
     public void keyResponder(String input){
         input = formatKey(input);
         
@@ -196,6 +202,8 @@ public class game{
         int locX = getLocXFromPos(x);
         int locY = getLocYFromPos(y);
         System.out.println("Locx: " + locX + " LocY: " + locY);
+        
+        board.nodes[locY][locX].setType("wall");
         //if(locX > 0 && locY > 0)
             
     }
