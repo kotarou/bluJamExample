@@ -107,6 +107,8 @@ public class game{
         
         board.nodes[10][20].setType("start");
         board.nodes[17][17].setType("goal");
+        board.nodes[30][30].setType("goal");
+        board.nodes[18][18].setType("goal");
         
         tickComponents.add(greg);
         
@@ -175,8 +177,12 @@ public class game{
 
     public void start(){
         //Stuff that needs to be at the end of setup.
-        greg.goalNode = board.nodes[17][17];
-        greg.moveToLocation(10,20);
+        greg.goalNodes = new LinkedList<>();
+        
+        greg.addGoal(17, 17);
+        greg.addGoal(30, 30);
+        greg.addGoal(18, 18);
+        greg.moveToLocation(20,10);
         greg.setupPath();
     }
     
@@ -202,9 +208,9 @@ public class game{
         int locX = getLocXFromPos(x);
         int locY = getLocYFromPos(y);
         System.out.println("Locx: " + locX + " LocY: " + locY);
+        if(locX > 0 && locY > 0)
+            board.nodes[locY][locX].setType("wall");
         
-        board.nodes[locY][locX].setType("wall");
-        //if(locX > 0 && locY > 0)
             
     }
     

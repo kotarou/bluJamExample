@@ -33,7 +33,8 @@ public class grad extends gameObject implements renderable, tickable
     
     public node currentNode;
     
-    public node goalNode;
+    public LinkedList<node> goalNodes;
+    public node currentGoal;
     
     public boolean active;
     
@@ -62,7 +63,7 @@ public class grad extends gameObject implements renderable, tickable
         this.tokenColor = Color.BLUE;
         
         nodeList = new ArrayList<>();
-        
+        goalNodes = new LinkedList<>();
         path = new LinkedList<>();
 
     }
@@ -93,18 +94,25 @@ public class grad extends gameObject implements renderable, tickable
         return index;
     }
     
+    public void addGoal(int locX, int locY){
+        this.goalNodes.add(parent.nodes[locY][locX]);
+    }
+    
     public void setupPath(){
+        this.active = true;
+        this.currentGoal = goalNodes.pop();
+        
         nodeList.clear();
         path.clear();
-        
+                
         // End location: (17,17)
         // First, set up the list of nodes.
         //pathableNodes = new PriorityQueue<>();
         for(int i = 0; i < parent.NODES_PER_SIDE; i++){
             for(int j = 0; j < parent.NODES_PER_SIDE; j++){
-                parent.nodes[i][j].resetPathing();
-                if(parent.nodes[i][j].passable){
-                    nodeList.add(parent.nodes[i][j]);
+                parent.nodes[j][i].resetPathing();
+                if(parent.nodes[j][i].passable){
+                    nodeList.add(parent.nodes[j][i]);
 
                 }
             }
@@ -144,7 +152,7 @@ public class grad extends gameObject implements renderable, tickable
             }
         }
         
-        node tNode = goalNode;
+        node tNode = currentGoal;
         
         while(tNode.pathingPrev != null)
         {
@@ -162,11 +170,18 @@ public class grad extends gameObject implements renderable, tickable
     }
     
     
-    public void tick(){
+    public void tick(){      
         if(!this.active)
-            return;
+        {
+            if(goalNodes.isEmpty())
+                return;
+            else
+            {
+                this.setupPath();
+            }
+        }
        
-        if(currentNode.locX == goalNode.locX && currentNode.locY == goalNode.locY)
+        if(this.locX == currentGoal.locX && this.locY == currentGoal.locY)
         {
             System.out.println("Made it!");
             this.active = false;
@@ -184,6 +199,8 @@ public class grad extends gameObject implements renderable, tickable
         // For initial setup, we stick it in the center of a node
         this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
         this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
+        
+        this.currentNode = parent.nodes[this.locY][this.locX];
     }
         
     public void moveToNode(node target){
@@ -194,6 +211,7 @@ public class grad extends gameObject implements renderable, tickable
         this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
         this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
         
+        this.currentNode = parent.nodes[this.locY][this.locX];
     }
     
 }
