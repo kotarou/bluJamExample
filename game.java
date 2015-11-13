@@ -32,9 +32,8 @@ public class game{
     double fps = 0;
     int lastLoopTime = 0;;
     
-    double x = 0;
-    ArrayList<renderable> renderComponents;
-    ArrayList<tickable> tickComponents;
+    double score = 0;
+
     
     JFrame windowFrame;
     JRootPane windowRoot;
@@ -44,8 +43,11 @@ public class game{
     JPanel inputPanel;
     JPopupMenu popup;
     
-    gameBoard board;
-    grad greg;
+    level currentLevel;
+    LinkedList<level> levels;
+    
+    //gameBoard board;
+    //grad greg;
     
     String mouseAttachment;
     
@@ -56,8 +58,7 @@ public class game{
 
         mouseAttachment = "";
         
-        renderComponents = new ArrayList<>();
-        tickComponents = new ArrayList<>();
+        levels = new LinkedList<>();
         
         UI.initialise();
         
@@ -81,8 +82,8 @@ public class game{
         // TODO: Make this actually work.
         //inputPanel.setSize(new Dimension(100,500));
         
-        UI.addButton("Spawn Next Level", UI::quit);
-        UI.addButton("Restart", this::start);
+        UI.addButton("Next Level", this::runNextLevel);
+        UI.addButton("Restart", this::restart);
         UI.addButton("Quit", UI::quit);
         
 
@@ -104,43 +105,10 @@ public class game{
         // Don't draw grpahics immediately. 
         UI.setImmediateRepaint(false);
         
+        levels.add(new level(this, 1.0));
+        levels.add(new level(this, 2.0));
         
-        
-        // Set up the in-game elements
-        board = new gameBoard();
-        greg = new grad(10, 20, board);
-        renderComponents.add(board);
-        renderComponents.add(greg);
-        
-        board.nodes[10][20].setType("start");
-        board.nodes[17][17].setType("goal");
-        board.nodes[30][30].setType("goal");
-        board.nodes[18][18].setType("goal");
-        
-        tickComponents.add(greg);
-        
-        // Wall boundaries around level
-        renderComponents.add(new wall(0, 0, board.NODES_PER_SIDE, 1, board));
-        renderComponents.add(new wall(board.NODES_PER_SIDE-1, 0, 1, board.NODES_PER_SIDE, board));
-        renderComponents.add(new wall(0, board.NODES_PER_SIDE-1, board.NODES_PER_SIDE, 1, board));
-        renderComponents.add(new wall(0, 0, 1, board.NODES_PER_SIDE, board));
-        
-        int[][] mask = {{1, 1, 1, 1, 1, 1, 0, 0}, 
-                        {0, 0, 0, 0, 0, 1, 0, 1},
-                        {0, 1, 1, 1, 0, 1, 0, 1},
-                        {0, 1, 0, 0, 0, 0, 0, 0},
-                        {0, 1, 1, 1, 1, 1, 0, 1},
-                        {0, 0, 0, 0, 0, 0, 0, 1},
-                        {1, 1, 1, 1, 1, 1, 1, 1},};
-        renderComponents.add(new wall(1, 1, mask, board));
 
-        
-        renderComponents.add(new wall(14, 16, 10, 1, board));
-        renderComponents.add(new wall(12, 11, 3, 11, board));
-        renderComponents.add(new wall(14, 20, 10, 1, board));
-        
-        renderComponents.add(new container(50, 60, 2, "wall (1x5)"));
-        renderComponents.add(new container(50, 110, 3, "wall (5x1)"));
         
         UI.setKeyListener(this::keyResponder);
         UI.setMouseMotionListener(this::mouseResponder);
@@ -160,7 +128,7 @@ public class game{
         //windowFrame.addMouseListener(new mouseResponder());
         
         windowFrame.pack();
-        start();
+        runNextLevel();
         
         
         while(gameRunning){
@@ -200,16 +168,28 @@ public class game{
         }
     }
 
-    public void start(){
-        //Stuff that needs to be at the end of setup.
-        greg.goalNodes = new LinkedList<>();
-        greg.energy = greg.maxEnergy;
+    public void runNextLevel(){
+        if(levels.size() == 0)
+        {
+            System.out.println("No more levels!");
+            return;
+        }
+        // Either this is the first lelvel, or we have passed the previous
+        if(currentLevel == null || currentLevel.passed)
+        {
+            currentLevel = levels.pop();
+            currentLevel.start();
+        }
+        else
+        {
+            System.out.println("You have not passed the current level!");
+        }
+
         
-        greg.addGoal(17, 17);
-        greg.addGoal(30, 30);
-        greg.addGoal(18, 18);
-        greg.moveToLocation(20,10);
-        greg.setupPath();
+    }
+    
+    public void restart(){
+        currentLevel.start();
     }
     
     public void keyResponder(String input){
@@ -237,12 +217,13 @@ public class game{
         if(action.equals("clicked"))
         {
             System.out.println("Mouse x: " + x + " y: " + y + " action: " + action);
+            System.out.println("Node type: " + currentLevel.board.nodes[locY][locX].type);
         }
         
         if(action.equals("pressed"))
         {
             // Find out if we have clicked in a container
-            for(renderable r : renderComponents)
+            for(renderable r : currentLevel.renderComponents)
             {
                 if(r instanceof container)
                 {
@@ -275,8 +256,8 @@ public class game{
                     {
                         for(int i = locX; i < locX + 5; i++)
                         {
-                            if( i < board.NODES_PER_SIDE){
-                                board.nodes[locY][i].setType("wall");
+                            if( i < currentLevel.board.NODES_PER_SIDE){
+                                currentLevel.board.nodes[locY][i].setType("wall");
                             }
                         }
                     }
@@ -284,8 +265,8 @@ public class game{
                     {
                         for(int i = locY; i < locY + 5; i++)
                         {
-                            if( i < board.NODES_PER_SIDE){
-                                board.nodes[i][locX].setType("wall");
+                            if( i < currentLevel.board.NODES_PER_SIDE){
+                                currentLevel.board.nodes[i][locX].setType("wall");
                             }
                         }
                     }                        
@@ -298,15 +279,15 @@ public class game{
     }
     
     public int getLocXFromPos(double x){
-        if(x < board.left || x > board.left + board.width)
+        if(x < currentLevel.board.left || x > currentLevel.board.left + currentLevel.board.width)
             return -1;
-        return (int)Math.floor((x - board.left) / (board.NODE_SIZE+board.W_OFFSET));
+        return (int)Math.floor((x - currentLevel.board.left) / (currentLevel.board.NODE_SIZE+currentLevel.board.W_OFFSET));
     }
 
     public int getLocYFromPos(double y){
-        if(y < board.top || y > board.top + board.height)
+        if(y < currentLevel.board.top || y > currentLevel.board.top + currentLevel.board.height)
             return -1;
-        return (int)Math.floor((y - board.top) / (board.NODE_SIZE+board.H_OFFSET));
+        return (int)Math.floor((y - currentLevel.board.top) / (currentLevel.board.NODE_SIZE+currentLevel.board.H_OFFSET));
     }
     
     public String formatKey(String input){
@@ -316,10 +297,8 @@ public class game{
     }
     
     public int gameLogic(double dt){      
-        for(tickable t : tickComponents)
-            t.tick();
-
-            return 0;
+        currentLevel.tick();
+        return 0;
     }
 
     public int gameRender(){
@@ -329,12 +308,14 @@ public class game{
         graphicsPanel = UI.getGraphics();
         graphicsPanel.setColor(Color.BLACK);
         // FPS counter
-        UI.drawString(String.format("FPS: %4.2f", fps), 20, 30);
-        UI.drawString(String.format("Grad energy: %4.2f", greg.energy), 20, 50);
+        UI.drawString(String.format("FPS: %4.2f", this.fps), 20, 20);
+        UI.drawString(String.format("Score: %4.2f", this.score), 20, 30);
+        UI.drawString(String.format("Score (this level): %4.2f", this.currentLevel.score), 20, 40);
+        UI.drawString(String.format("Grad energy: %4.2f", currentLevel.token.energy), 20, 50);
         
         
         
-        for(renderable r : renderComponents){
+        for(renderable r : currentLevel.renderComponents){
             r.render(graphicsPanel);
         }
         

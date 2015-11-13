@@ -38,16 +38,18 @@ public class grad extends gameObject implements renderable, tickable
     
     public boolean active;
     
+    private level plat;
+    
     public double maxEnergy;
     public double energy;
     
     /**
      * Constructor for objects of class grad
      */
-    public grad(int locX, int locY, gameBoard board)
+    public grad(int locX, int locY, gameBoard board, level plat)
     {      
         this.active = true;
-        
+        this.plat = plat;
         this.anchor = 1;
         // The grad token can be in multiple nodes, depending on its exact position.
         // This does not count as covering a node.
@@ -182,7 +184,10 @@ public class grad extends gameObject implements renderable, tickable
         if(!this.active)
         {
             if(goalNodes.isEmpty())
+            {
+                this.plat.end(true);
                 return;
+            }
             else
             {
                 this.setupPath();
@@ -206,6 +211,7 @@ public class grad extends gameObject implements renderable, tickable
             {
                 System.out.println("Grad has run out of energy!");
                 this.active = false;
+                this.plat.end(false);
             }
         }
 

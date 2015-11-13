@@ -64,12 +64,22 @@ public class node extends gameObject implements renderable//, Comparable<node>
         this.type = type;
         
         if(this.type.equals("floor"))
+        {
             this.nodeColor = Color.WHITE;
+            this.passable = true;
+        }
         if(this.type.equals("goal"))
+        {
             this.nodeColor = Color.RED;
+            this.passable = true;
+        }
         if(this.type.equals("start"))
+        {
             this.nodeColor = Color.BLUE;
-        if(this.type.equals("wall")){
+            this.passable = true;
+        }
+        if(this.type.equals("wall"))
+        {
             this.nodeColor = Color.BLACK;
             this.passable = false;
         }
