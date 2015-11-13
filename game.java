@@ -44,7 +44,6 @@ public class game{
     JPanel inputPanel;
     JPopupMenu popup;
     
-    
     gameBoard board;
     grad greg;
     
@@ -249,7 +248,7 @@ public class game{
                 {
                     // Ugly cast, but it works
                     container t = (container) r;
-                    if( x < t.posX || x > t.posX+100 || y < t.posY || y > t.posY+40)
+                    if( x < t.pos.x || x > t.pos.x+100 || y < t.pos.y || y > t.pos.y+40)
                         continue;
                     else
                     {

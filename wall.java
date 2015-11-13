@@ -14,16 +14,13 @@ public class wall extends gameObject implements renderable
     {
         // The anchor is top left = default.
         
-        this.locX = locX;
-        this.locY = locY;
+        this.loc = new vec2i(locX, locY);
         
         this.parent = parent;
         
-        this.posX = this.getPosXFromLoc();
-        this.posY = this.getPosYFromLoc();
+        this.pos = this.getPosFromLoc();
         
-        this.lWidth = lWidth;
-        this.lHeight = lHeight;
+        this.dimension = new vec2i(lWidth, lHeight);
         
         if(this.valid() != 0)
             throw new RuntimeException("Invalid wall!");
@@ -38,13 +35,11 @@ public class wall extends gameObject implements renderable
     {
         // The anchor is top left = default.
         
-        this.locX = locX;
-        this.locY = locY;
+        this.loc = new vec2i(locX, locY);
         
         this.parent = parent;
         
-        this.posX = this.getPosXFromLoc();
-        this.posY = this.getPosYFromLoc();
+        this.pos = this.getPosFromLoc();
         
         // rotating this 90 dgerees so it is actually useful
         this.shapeMask = mask; //new int[mask[0].length][mask.length];
@@ -54,8 +49,7 @@ public class wall extends gameObject implements renderable
                 this.shapeMask[i][j] = mask[j][i];
             }*/
         
-        this.lWidth = this.shapeMask[0].length;
-        this.lHeight = this.shapeMask.length;
+        this.dimension = new vec2i(this.shapeMask[0].length, this.shapeMask.length);
         
         if(this.valid() != 0)
             throw new RuntimeException("Invalid wall!");
@@ -72,13 +66,12 @@ public class wall extends gameObject implements renderable
     public void render(Graphics2D panel){
         panel.setColor(this.color);
         
-        for(int i = 0; i < lWidth; i++)
-            for(int j = 0; j < lHeight; j++)
+        for(int i = 0; i < this.dimension.x; i++)
+            for(int j = 0; j < this.dimension.y; j++)
             {
-                double px = this.parent.nodes[locY+j][locX+i].posX;
-                double py = this.parent.nodes[locY+j][locX+i].posY;
+                vec2i p = this.parent.nodes[this.loc.y+j][this.loc.x+i].pos.toVec2i();
                 if(this.shapeMask == null || this.shapeMask[j][i] == 1)
-                    panel.fillRect((int)px, (int)py, this.parent.NODE_SIZE, this.parent.NODE_SIZE);
+                    panel.fillRect(p.x, p.y, this.parent.NODE_SIZE, this.parent.NODE_SIZE);
             }
             
             

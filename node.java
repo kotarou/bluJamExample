@@ -7,7 +7,7 @@
 
 import java.awt.*;
 
-public class node extends gameObject implements renderable, Comparable<node>
+public class node extends gameObject implements renderable//, Comparable<node>
 {
 
     public double pathingDist = Double.MAX_VALUE-10;
@@ -40,11 +40,10 @@ public class node extends gameObject implements renderable, Comparable<node>
         
         NODE_SIZE = parent.NODE_SIZE;
         
-        this.locX = locX;
-        this.locY = locY;
+        this.loc = new vec2i(locX, locY);
         
-        this.posX = parent.left + (this.locX*NODE_SIZE) + ((this.locX+1)*parent.H_OFFSET);
-        this.posY = parent.top + (this.locY*NODE_SIZE) + ((this.locY+1)*parent.W_OFFSET);
+        this.pos = new vec2d(parent.left + (this.loc.x*NODE_SIZE) + ((this.loc.x+1)*parent.H_OFFSET),
+                                parent.top + (this.loc.y*NODE_SIZE) + ((this.loc.y+1)*parent.W_OFFSET));
 
         this.type = type;   
         
@@ -84,26 +83,26 @@ public class node extends gameObject implements renderable, Comparable<node>
     */
    public void createLinks(){
         // north relation
-        if(this.locY > 0)
-            this.north = this.parent.nodes[this.locY-1][this.locX];
+        if(this.loc.y > 0)
+            this.north = this.parent.nodes[this.loc.y-1][this.loc.x];
         else
             this.north = null;
         
         // east relation
-        if(this.locX < this.parent.NODES_PER_SIDE - 1)
-            this.east = this.parent.nodes[this.locY][this.locX+1];
+        if(this.loc.x < this.parent.NODES_PER_SIDE - 1)
+            this.east = this.parent.nodes[this.loc.y][this.loc.x+1];
         else
             this.east = null;
          
         // south relation
-        if(this.locY < this.parent.NODES_PER_SIDE - 1)
-            this.south = this.parent.nodes[this.locY+1][this.locX];
+        if(this.loc.y < this.parent.NODES_PER_SIDE - 1)
+            this.south = this.parent.nodes[this.loc.y+1][this.loc.x];
         else
             this.south = null; 
             
         // west relation
-        if(this.locX > 0)
-            this.west = this.parent.nodes[this.locY][this.locX-1];
+        if(this.loc.x > 0)
+            this.west = this.parent.nodes[this.loc.y][this.loc.x-1];
         else
             this.west = null;    
 
@@ -113,7 +112,7 @@ public class node extends gameObject implements renderable, Comparable<node>
     
     public void render(Graphics2D panel){
         panel.setColor(this.nodeColor);
-        panel.fillRect((int)this.posX, (int)this.posY, NODE_SIZE, NODE_SIZE);
+        panel.fillRect((int)this.pos.x, (int)this.pos.y, NODE_SIZE, NODE_SIZE);
     }
     
     public boolean wallNorth(){
@@ -132,10 +131,10 @@ public class node extends gameObject implements renderable, Comparable<node>
     /*
      * Basic heurisitc for path finding
      */
-    public int compareTo(node other){
+    /*public int compareTo(node other){
         // TODO use a non-hardcoded goal
-        return (int)(Math.sqrt(Math.pow((this.locX-17),2) + Math.pow((this.locY-17),2)) -
-                Math.sqrt(Math.pow((other.locX-17),2) + Math.pow((other.locY-17),2)));
-    }
+        return (int)(Math.sqrt(Math.pow((this.loc.x-17),2) + Math.pow((this.loc.y-17),2)) -
+                Math.sqrt(Math.pow((other.loc.x-17),2) + Math.pow((other.loc.y-17),2)));
+    }*/
     
 }

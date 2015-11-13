@@ -18,8 +18,8 @@ public class grad extends gameObject implements renderable, tickable
     // Actual game locations are doubles.
 
     // The center of the token, not the border!
-    public double posX;
-    public double posY;
+    public vec2d pos;
+    public vec2i loc;
     public double radius;
     public Color tokenColor;
     public int velocity = 10;
@@ -55,12 +55,12 @@ public class grad extends gameObject implements renderable, tickable
         
         this.parent = board;
         
-        this.locX = locX;
-        this.locY = locY;
+        this.loc = new vec2i(locX, locY);
         
         // For initial setup, we stick it in the center of a node
-        this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
-        this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
+        this.pos = new vec2d(this.getPosXFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2),
+                       this.getPosYFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2));
+         
 
         this.radius = 3;
         this.tokenColor = Color.BLUE;
@@ -76,7 +76,7 @@ public class grad extends gameObject implements renderable, tickable
 
     public void render(Graphics2D panel){
         panel.setColor(this.tokenColor);
-        panel.fillOval((int)(this.posX-this.radius), (int)(this.posY-this.radius), (int)this.radius*2, (int)this.radius*2);
+        panel.fillOval((int)(this.pos.x-this.radius), (int)(this.pos.y-this.radius), (int)this.radius*2, (int)this.radius*2);
 
     }
     // Pathfinding!!
@@ -108,6 +108,8 @@ public class grad extends gameObject implements renderable, tickable
         this.active = true;
         this.currentGoal = goalNodes.pop();
         
+        System.out.println("Current goal: " + this.currentGoal.loc);
+        
         nodeList.clear();
         path.clear();
                 
@@ -124,7 +126,7 @@ public class grad extends gameObject implements renderable, tickable
             }
         }
  
-        currentNode = parent.nodes[this.locX][this.locY];
+        currentNode = parent.nodes[this.loc.y][this.loc.x];
         currentNode.pathingDist = 0.0;
         
         while(nodeList.isEmpty()== false)
@@ -187,7 +189,7 @@ public class grad extends gameObject implements renderable, tickable
             }
         }
        
-        if(this.locX == currentGoal.locX && this.locY == currentGoal.locY)
+        if(this.loc.x == currentGoal.loc.x && this.loc.y == currentGoal.loc.y)
         {
             System.out.println("Made it!");
             this.active = false;
@@ -208,25 +210,23 @@ public class grad extends gameObject implements renderable, tickable
         }
 
     public void moveToLocation(int x, int y){
-        this.locX = x;
-        this.locY = y;
-        System.out.println("Location: (" + this.locX + "," + this.locY+")");
+        this.loc = new vec2i(x, y);
+        System.out.println("Location: (" + this.loc.x + "," + this.loc.y+")");
         // For initial setup, we stick it in the center of a node
-        this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
-        this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
+        this.pos = new vec2d(this.getPosXFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2),
+                            this.getPosYFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2));
         
-        this.currentNode = parent.nodes[this.locY][this.locX];
+        this.currentNode = parent.nodes[this.loc.y][this.loc.x];
     }
         
     public void moveToNode(node target){
-        this.locX = target.locX;
-        this.locY = target.locY;
-        System.out.println("Location: (" + this.locX + "," + this.locY+")");
+        this.loc = target.loc;
+        System.out.println("Location: (" + this.loc.x + "," + this.loc.y+")");
         // For initial setup, we stick it in the center of a node
-        this.posX = this.getPosXFromLoc() + ( this.parent.NODE_SIZE / 2);
-        this.posY = this.getPosYFromLoc() + ( this.parent.NODE_SIZE / 2);
+        this.pos = new vec2d(this.getPosXFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2),
+                            this.getPosYFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2));
         
-        this.currentNode = parent.nodes[this.locY][this.locX];
+        this.currentNode = parent.nodes[this.loc.y][this.loc.x];
     }
     
 }

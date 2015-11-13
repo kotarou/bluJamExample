@@ -8,8 +8,7 @@ import java.awt.Color;
  */
 public class container implements renderable
 {
-    public int posX;
-    public int posY;
+    public vec2i pos;
     public int capacity;
     public String type;
     public int current;
@@ -19,8 +18,7 @@ public class container implements renderable
      */
     public container(int x, int y, int capacity, String type)
     {
-        this.posX = x;
-        this.posY = y;
+        this.pos = new vec2i(x, y);
         this.capacity = capacity;
         this.current = capacity;
         this.type = type;
@@ -30,7 +28,7 @@ public class container implements renderable
     public void render(Graphics2D panel)
     {
         panel.setColor(Color.BLACK);
-        panel.drawRect(this.posX, this.posY, 150, 40);
-        panel.drawString(type + ": " + this.current + " of " + this.capacity, this.posX + 5, this.posY + 15); 
+        panel.drawRect(this.pos.x, this.pos.y, 150, 40);
+        panel.drawString(type + ": " + this.current + " of " + this.capacity, this.pos.x + 5, this.pos.y + 15); 
     }
 }
