@@ -76,26 +76,7 @@ public class level
         token.goalNodes = new LinkedList<>();
         token.energy = token.maxEnergy;
         
-        for(int i = 0; i < this.board.NODES_PER_SIDE; i++)
-        {
-            for(int j = 0; j < this.board.NODES_PER_SIDE; j++)
-            {
-                if(this.board.nodes[j][i].type.equals("wall"))
-                    this.board.nodes[j][i].setType("floor");
-            }
-        }
-        
-        for(renderable r : renderComponents)
-        {
-                if(r instanceof container)
-                {
-                    // Ugly cast, but it works
-                    container t = (container) r;
-                    t.current = t.capacity;
-                }
-         }
-
-         token.addGoal(17, 17);
+        token.addGoal(17, 17);
         token.addGoal(30, 30);
         token.addGoal(18, 18);
         token.moveToLocation(20,10);

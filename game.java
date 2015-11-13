@@ -83,7 +83,8 @@ public class game{
         //inputPanel.setSize(new Dimension(100,500));
         
         UI.addButton("Next Level", this::runNextLevel);
-        UI.addButton("Restart", this::restart);
+        UI.addButton("Reset Walls", this::resetW);
+        UI.addButton("Reset Grad", this::resetG);
         UI.addButton("Quit", UI::quit);
         
 
@@ -188,7 +189,28 @@ public class game{
         
     }
     
-    public void restart(){
+    public void resetW(){
+        for(int i = 0; i < this.currentLevel.board.NODES_PER_SIDE; i++)
+        {
+            for(int j = 0; j < this.currentLevel.board.NODES_PER_SIDE; j++)
+            {
+                if(this.currentLevel.board.nodes[j][i].type.equals("wall"))
+                    this.currentLevel.board.nodes[j][i].setType("floor");
+            }
+        }
+        
+        for(renderable r : currentLevel.renderComponents)
+        {
+                if(r instanceof container)
+                {
+                    // Ugly cast, but it works
+                    container t = (container) r;
+                    t.current = t.capacity;
+                }
+         }
+    }
+    
+    public void resetG(){
         currentLevel.start();
     }
     
