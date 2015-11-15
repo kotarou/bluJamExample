@@ -51,6 +51,10 @@ public class game{
     
     String mouseAttachment;
     
+    // Mouse location, for drawing dragged object
+    double mx = 0.0;
+    double my = 0.0;
+    
     /**      */
     public void run(){
         // Game timing
@@ -234,7 +238,11 @@ public class game{
         int locX = getLocXFromPos(x);
         int locY = getLocYFromPos(y);
         
-        
+        if(mouseAttachment.length() > 0)
+        {
+            mx = x;
+            my = y;
+        }
         
         if(action.equals("clicked"))
         {
@@ -335,11 +343,22 @@ public class game{
         UI.drawString(String.format("Score (this level): %4.2f", this.currentLevel.score), 20, 40);
         UI.drawString(String.format("Grad energy: %4.2f", currentLevel.token.energy), 20, 50);
         
-        
-        
+       
         for(renderable r : currentLevel.renderComponents){
             r.render(graphicsPanel);
         }
+        
+        // Render object under mouse, if any
+        if(mouseAttachment.length() > 0)
+        {
+            graphicsPanel.setColor(Color.BLACK);
+            // TODO: replace hardcoded node sizes
+            if(mouseAttachment.equals("wall (5x1)"))
+                graphicsPanel.fillRect((int)mx, (int)my, 5*11, 1*11);
+            else if(mouseAttachment.equals("wall (1x5)"))
+                graphicsPanel.fillRect((int)mx, (int)my, 1*11, 5*11);
+        }
+        
         
         // As immediate mode is set to false, we will need to explicitly call repaint
         UI.repaintGraphics();
