@@ -54,7 +54,7 @@ public class game{
     // Mouse location, for drawing dragged object
     double mx = 0.0;
     double my = 0.0;
-    
+        
     /**      */
     public void run(){
         // Game timing
@@ -114,14 +114,21 @@ public class game{
         ArrayList<vec2i> l1goals = new ArrayList<>();
         l1goals.add(new vec2i(30, 30));
         int[] l1walls = {2, 2};
-        levels.add(new level(this, 1.0, new vec2i(10,10), l1goals, 40.0, l1walls));
-        // levels.add(new level(this, 2.0));
+        levels.add(new level(this, 1.0, new vec2i(10,10), l1goals, 40.0, l1walls, 5));
+        // Level 2
         ArrayList<vec2i> l2goals = new ArrayList<>();
         l2goals.add(new vec2i(20, 20));
         l2goals.add(new vec2i(30, 30));
         int[] l2walls = {3, 3};
-        levels.add(new level(this, 1.0, new vec2i(10,10), l2goals, 55.0, l2walls));
-
+        levels.add(new level(this, 1.0, new vec2i(10,10), l2goals, 55.0, l2walls, 3));
+        // Level three
+        ArrayList<vec2i> l3goals = new ArrayList<>();
+        l3goals.add(new vec2i(2, 2));
+        l3goals.add(new vec2i(30, 30));
+        l3goals.add(new vec2i(10, 10));
+        l3goals.add(new vec2i(12, 24));
+        int[] l3walls = {3, 3};
+        levels.add(new level(this, 1.0, new vec2i(10,11), l3goals, 120.0, l3walls, 2));
         
         UI.setKeyListener(this::keyResponder);
         UI.setMouseMotionListener(this::mouseResponder);
@@ -191,7 +198,7 @@ public class game{
         if(currentLevel == null || currentLevel.passed)
         {
             currentLevel = levels.pop();
-            currentLevel.start();
+            currentLevel.start(false);
         }
         else
         {
@@ -223,7 +230,7 @@ public class game{
     }
     
     public void resetG(){
-        currentLevel.start();
+        currentLevel.start(true);
     }
     
     public void keyResponder(String input){
@@ -358,7 +365,10 @@ public class game{
         else
             UI.drawString(String.format("Score (this level): %4.2f", this.currentLevel.score), 20, 40);
         UI.drawString(String.format("Grad energy: %4.2f", currentLevel.token.energy), 20, 50);
-        
+        if(this.currentLevel.lives > 0)
+            UI.drawString(String.format("Attempts remaining for this level: %d", this.currentLevel.lives), 20, 60);
+        else
+            UI.drawString(String.format("NO ATTEEMPTS LEFT: YOU LOSE"), 20, 60);
        
         for(renderable r : currentLevel.renderComponents){
             r.render(graphicsPanel);

@@ -20,16 +20,18 @@ public class level
     public boolean active = false;
     ArrayList<vec2i> goalNodes;
     //public int 
-
+    int lives = 0;
     vec2i start;
     /**
      * Constructor for objects of class level
      */
-    public level(game parent, double multi, vec2i start, ArrayList<vec2i> goals, double gradEnergy, int[] walls)
+    public level(game parent, double multi, vec2i start, ArrayList<vec2i> goals, double gradEnergy, int[] walls, int lives)
     {
         this.maxScore = gradEnergy * scoreMultiplier;
         this.parent = parent;
         this.passed = false;
+        
+        this.lives = lives;
         
         renderComponents = new ArrayList<>();
         tickComponents = new ArrayList<>();
@@ -68,13 +70,18 @@ public class level
         renderComponents.add(new wall(12, 11, 3, 11, board));
         renderComponents.add(new wall(14, 20, 10, 1, board));*/
         
-        renderComponents.add(new container(50, 60, walls[0], "wall (1x5)"));
-        renderComponents.add(new container(50, 110, walls[1], "wall (5x1)"));
+        renderComponents.add(new container(50, 70, walls[0], "wall (1x5)"));
+        renderComponents.add(new container(50, 120, walls[1], "wall (5x1)"));
     }
     
-    public void start(){
+    public void start(boolean run){
         //this.passed = false;
-        this.active = true;
+        if(this.lives <= 0)
+        {
+            System.out.println("You have lost!");
+            return;
+        }
+        this.active = run;
         token.goalNodes.clear();
         for(vec2i loc : this.goalNodes)
             token.addGoal(loc);
@@ -82,8 +89,11 @@ public class level
         
         token.energy = token.maxEnergy;
         
-        token.moveToLocation(this.start);
-        token.setupPath();
+        if(run)
+        {
+            token.moveToLocation(this.start);
+            token.setupPath();
+        }
     }
     
     public void end(boolean office){
@@ -91,12 +101,16 @@ public class level
         {
             System.out.println("Grad student has reached office. You failed!");
             this.score = 0;
+            this.lives -= 1;
         }
         else
         {
             System.out.println("The grad ran out of energy.... Congrats!");
             if(!this.passed)
+            {
                 this.parent.score += this.score;
+            }
+                
             this.passed = true;
         }
         this.active = false;
