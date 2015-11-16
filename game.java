@@ -110,9 +110,17 @@ public class game{
         // Don't draw grpahics immediately. 
         UI.setImmediateRepaint(false);
         
-        levels.add(new level(this, 1.0));
-        levels.add(new level(this, 2.0));
-        
+        // Hacky setyup of levels
+        ArrayList<vec2i> l1goals = new ArrayList<>();
+        l1goals.add(new vec2i(30, 30));
+        int[] l1walls = {2, 2};
+        levels.add(new level(this, 1.0, new vec2i(10,10), l1goals, 40.0, l1walls));
+        // levels.add(new level(this, 2.0));
+        ArrayList<vec2i> l2goals = new ArrayList<>();
+        l2goals.add(new vec2i(20, 20));
+        l2goals.add(new vec2i(30, 30));
+        int[] l2walls = {3, 3};
+        levels.add(new level(this, 1.0, new vec2i(10,10), l2goals, 55.0, l2walls));
 
         
         UI.setKeyListener(this::keyResponder);
@@ -259,8 +267,9 @@ public class game{
                 {
                     // Ugly cast, but it works
                     container t = (container) r;
+                    // Check for bounding
                     if( x < t.pos.x || x > t.pos.x+100 || y < t.pos.y || y > t.pos.y+40)
-                        continue;
+                        continue;                    
                     else
                     {
                         // We have clicked within the container
@@ -286,7 +295,9 @@ public class game{
                     {
                         for(int i = locX; i < locX + 5; i++)
                         {
-                            if( i < currentLevel.board.NODES_PER_SIDE){
+                            if( i < currentLevel.board.NODES_PER_SIDE 
+                                && !currentLevel.board.nodes[locY][i].type.equals("start") 
+                                && !currentLevel.board.nodes[locY][i].type.equals("goal")){
                                 currentLevel.board.nodes[locY][i].setType("wall");
                             }
                         }
@@ -295,7 +306,9 @@ public class game{
                     {
                         for(int i = locY; i < locY + 5; i++)
                         {
-                            if( i < currentLevel.board.NODES_PER_SIDE){
+                            if( i < currentLevel.board.NODES_PER_SIDE 
+                                && !currentLevel.board.nodes[i][locX].type.equals("start") 
+                                && !currentLevel.board.nodes[i][locX].type.equals("goal")){
                                 currentLevel.board.nodes[i][locX].setType("wall");
                             }
                         }
@@ -340,7 +353,10 @@ public class game{
         // FPS counter
         UI.drawString(String.format("FPS: %4.2f", this.fps), 20, 20);
         UI.drawString(String.format("Score: %4.2f", this.score), 20, 30);
-        UI.drawString(String.format("Score (this level): %4.2f", this.currentLevel.score), 20, 40);
+        if(this.currentLevel.active)
+            UI.drawString(String.format("Possible score (this level): %4.2f", this.currentLevel.score), 20, 40);
+        else
+            UI.drawString(String.format("Score (this level): %4.2f", this.currentLevel.score), 20, 40);
         UI.drawString(String.format("Grad energy: %4.2f", currentLevel.token.energy), 20, 50);
         
        

@@ -46,7 +46,7 @@ public class grad extends gameObject implements renderable, tickable
     /**
      * Constructor for objects of class grad
      */
-    public grad(int locX, int locY, gameBoard board, level plat)
+    public grad(vec2i loc, gameBoard board, level plat, double maxEnergy)
     {      
         this.active = true;
         this.plat = plat;
@@ -57,7 +57,7 @@ public class grad extends gameObject implements renderable, tickable
         
         this.parent = board;
         
-        this.loc = new vec2i(locX, locY);
+        this.loc = loc;
         
         // For initial setup, we stick it in the center of a node
         this.pos = new vec2d(this.getPosXFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2),
@@ -71,7 +71,7 @@ public class grad extends gameObject implements renderable, tickable
         goalNodes = new LinkedList<>();
         path = new LinkedList<>();
         
-        this.maxEnergy = 100.0;
+        this.maxEnergy = maxEnergy;
         this.energy = maxEnergy;
 
     }
@@ -101,9 +101,10 @@ public class grad extends gameObject implements renderable, tickable
         //System.out.println(smallest);
         return index;
     }
-    
-    public void addGoal(int locX, int locY){
-        this.goalNodes.add(parent.nodes[locY][locX]);
+        
+    public void addGoal(vec2i loc){
+        System.out.println("Adding goal.");
+        this.goalNodes.add(parent.nodes[loc.y][loc.x]);
     }
     
     public void setupPath(){
@@ -215,9 +216,14 @@ public class grad extends gameObject implements renderable, tickable
             }
         }
 
+        
+    public void moveToLocation(vec2i loc){
+        this.moveToLocation(loc.x, loc.y);
+    }
+        
     public void moveToLocation(int x, int y){
         this.loc = new vec2i(x, y);
-        System.out.println("Location: (" + this.loc.x + "," + this.loc.y+")");
+        //System.out.println("Location: (" + this.loc.x + "," + this.loc.y+")");
         // For initial setup, we stick it in the center of a node
         this.pos = new vec2d(this.getPosXFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2),
                             this.getPosYFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2));
@@ -227,7 +233,7 @@ public class grad extends gameObject implements renderable, tickable
         
     public void moveToNode(node target){
         this.loc = target.loc;
-        System.out.println("Location: (" + this.loc.x + "," + this.loc.y+")");
+        //System.out.println("Location: (" + this.loc.x + "," + this.loc.y+")");
         // For initial setup, we stick it in the center of a node
         this.pos = new vec2d(this.getPosXFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2),
                             this.getPosYFromLoc(this.loc) + ( this.parent.NODE_SIZE / 2));
