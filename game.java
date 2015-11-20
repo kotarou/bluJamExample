@@ -128,7 +128,7 @@ public class game{
         l3goals.add(new vec2i(10, 10));
         l3goals.add(new vec2i(12, 24));
         int[] l3walls = {3, 3};
-        levels.add(new level(this, 1.0, new vec2i(10,11), l3goals, 120.0, l3walls, 2));
+        levels.add(new level(this, 1.0, new vec2i(10,11), l3goals, 160.0, l3walls, 2));
         
         UI.setKeyListener(this::keyResponder);
         UI.setMouseMotionListener(this::mouseResponder);

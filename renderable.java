@@ -8,8 +8,6 @@ import java.awt.Graphics2D;
  */
 public interface renderable
 {
-    public boolean visible = true;
-
     /**
      * Render the object. 
      */
